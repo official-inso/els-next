@@ -5,9 +5,9 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue.svg)](https://www.typescriptlang.org/)
 [![license MIT](https://img.shields.io/npm/l/@inso_web/els-next.svg)](./LICENSE)
 
-Next.js helpers для **Inso Error Logs Service (ELS)** — управляемого SaaS централизованного сбора ошибок и событий с AI-диагностикой. Работает в API Routes (App + Pages Router), `middleware.ts`, edge runtime, server actions и в клиентском бандле.
+Next.js helpers для **Inso Error Logs Service (ELS)** — управляемого SaaS централизованного сбора событий (от debug до fatal) с AI-диагностикой ошибок. Работает в API Routes (App + Pages Router), `middleware.ts`, edge runtime, server actions и в клиентском бандле.
 
-> 🇬🇧 [English version → README.md](README.md) &nbsp;•&nbsp; 📚 [Обзор всех SDK → ../README_RU.md](../README_RU.md)
+> 🇬🇧 [English version → README.md](README.md)
 
 ---
 
@@ -39,11 +39,14 @@ Next.js helpers для **Inso Error Logs Service (ELS)** — управляем�
 
 ## Что вы получаете
 
-Встроенная панель с полнотекстовым поиском, фасетной фильтрацией, AI-диагностикой и виджетом регрессий — для серверных событий (API routes, middleware, RSC) и клиентских.
+ELS из коробки даёт встроенную админ-панель. Каждое событие, отправленное этим SDK — серверные (API routes, middleware, RSC) и клиентские — попадает туда с полнотекстовым поиском, фасетной фильтрацией, AI-диагностикой и обнаружением регрессий по версиям.
 
-![Превью панели ELS](https://raw.githubusercontent.com/official-inso/els-go/main/docs/screenshots/01-error-logs-list.png)
-
-→ **[Полный обзор UI с 4 скриншотами](../README_RU.md#что-вы-получаете)**
+| | |
+|---|---|
+| ![Список логов](https://raw.githubusercontent.com/official-inso/els-go/main/docs/screenshots/01-error-logs-list.png) | ![Карточка события](https://raw.githubusercontent.com/official-inso/els-go/main/docs/screenshots/02-event-detail-info.png) |
+| Виртуальная таблица с фасетным сайдбаром (приложение, окружение, **версия**, источник, уровень, браузер, IP, категория). Live-режим обновляет данные каждые 5с. | Полные метаданные события: время, гео, окружение, **версия приложения**, fingerprint, session, карточки повторений, корреляция в рамках сессии. |
+| ![AI-диагностика](https://raw.githubusercontent.com/official-inso/els-go/main/docs/screenshots/03-error-detail-ai.png) | ![Аналитика](https://raw.githubusercontent.com/official-inso/els-go/main/docs/screenshots/04-analytics-dashboard.png) |
+| Распарсенный stack trace + AI-анализ: что сломалось, где, как чинить. | Timeline, donut'ы, топ URL/IP, тепловая карта по часам, **виджет регрессий по версиям**. |
 
 ---
 
@@ -250,7 +253,7 @@ reqLog.info('processing checkout');
 
 ## Конфигурация
 
-`ELSConfig` совпадает с базовым клиентом — см. [@inso_web/els-client](../js/README_RU.md). Ключевые поля:
+`ELSConfig` совпадает с базовым клиентом — см. [@inso_web/els-client](https://github.com/official-inso/els-client). Ключевые поля:
 
 | Опция | Описание |
 |---|---|
@@ -458,14 +461,29 @@ ELS для Node.js — сфокусированный SaaS для логиров
 - **5 минут интеграции.** Один `lib/logger.ts` покрывает server, client, edge.
 - **Прозрачные тарифы.** Цены в личном кабинете.
 
-| Возможность | ELS | Sentry | Datadog | Loki | LogRocket |
-|---|---|---|---|---|---|
-| AI на stack-trace | Встроено | Платный аддон | Платный аддон | Нет | Нет |
-| Zero-dep SDK | Да | Нет | Нет | Нет | Нет |
-| Free-tier retention | 24ч | 30д (лимит) | Только триал | Self-cost | 3–30д |
-| Время setup | ~5 мин | 10–20 мин | 30–60 мин | Часы | 10–20 мин |
+### Подробное сравнение
 
-ELS **не предоставляет**: full APM / tracing, source-map upload, session replay, frontend RUM, метрики инфраструктуры. Если критично — оставьте Sentry или добавьте Grafana / Datadog рядом.
+| Категория | ELS | Sentry | Datadog / New Relic | Grafana Loki | LogRocket / Logtail / BetterStack |
+|---|---|---|---|---|---|
+| Модель хостинга | Managed SaaS | SaaS или self-hosted | Только SaaS | Self-hosted / Grafana Cloud | SaaS |
+| Runtime-зависимости SDK | Ноль | Средне (саб-SDK, интеграции) | Тяжёлый агент + tracing | Promtail / агент | Средне |
+| Время интеграции | ~5 мин | 10–20 мин | 30–60 мин | Часы — дни | 10–20 мин |
+| AI-диагностика | Встроена | Платный аддон | Платный аддон | Нет | Нет |
+| Группировка / fingerprint | Да | Да | Да | Вручную через LogQL | Частично |
+| Source-map upload | Нет | Да | Да | н/п | Частично |
+| Session replay (frontend) | Нет | Платно | Платно | н/п | Да (core) |
+| Distributed tracing / APM | Нет | Частично | Да (core) | Да с Tempo | Нет |
+| Метрики инфраструктуры | Нет | Нет | Да (core) | Да с Mimir | Нет |
+| Хранение на free-тарифе | 24 часа | 30 дней (лимит объёма) | Только триал | Self-cost | 3–30 дней |
+| Поддержка / документация на русском | Нативно | Сообщество | Ограничено | Сообщество | Нет |
+
+### Когда ELS — неподходящий выбор
+
+- Нужен один вендор на **APM + логи + метрики** одним счётом — берите Datadog или New Relic.
+- Триаж фронтенда строится вокруг **DOM session replay** — LogRocket или Sentry Replay.
+- Публичное мобильное приложение, нужны symbolication и ANR-детект — Firebase Crashlytics или Sentry Mobile.
+
+Во всех остальных сценариях — backend-ошибки, JS-ошибки фронта, request-логи, структурированные события с version-aware-аналитикой — ELS даёт самый короткий путь до рабочей панели.
 
 → **Регистрация на [lk.insoweb.ru](https://lk.insoweb.ru)** для API-ключа.
 
@@ -477,7 +495,7 @@ ELS **не предоставляет**: full APM / tracing, source-map upload, 
 function createELSLogger(config: ELSConfig): Logger;
 ```
 
-`ELSConfig` совпадает с базовым клиентом — см. [@inso_web/els-client](../js/README_RU.md). Методы `Logger`: `fatal` / `error` / `warn` / `info` / `debug` / `trace` / `child` / `flush`.
+`ELSConfig` совпадает с базовым клиентом — см. [@inso_web/els-client](https://github.com/official-inso/els-client). Методы `Logger`: `fatal` / `error` / `warn` / `info` / `debug` / `trace` / `child` / `flush`.
 
 ---
 
@@ -498,19 +516,17 @@ function createELSLogger(config: ELSConfig): Logger;
 Тот же wire-формат, та же панель — выбирайте по стеку.
 
 **Node.js**
-- [`@inso_web/els-client`](../js/README_RU.md) — базовый TS / Node / browser клиент
-- [`@inso_web/els-express`](../express/README_RU.md) — Express middleware
-- [`@inso_web/els-next`](../next/README_RU.md) — хелперы для Next.js (этот пакет)
-- [`@inso_web/els-nest`](../nest/README_RU.md) — NestJS module
-- [`@inso_web/els-react`](../react/README_RU.md) — React Provider, hooks, ErrorBoundary
-- [`@inso_web/els-vue`](../vue/README_RU.md) — Vue 3 plugin
+- [`@inso_web/els-client`](https://github.com/official-inso/els-client) — базовый TS / Node / browser клиент
+- [`@inso_web/els-express`](https://github.com/official-inso/els-express) — Express middleware
+- [`@inso_web/els-next`](https://github.com/official-inso/els-next) — хелперы для Next.js (этот репо)
+- [`@inso_web/els-nest`](https://github.com/official-inso/els-nest) — NestJS module
+- [`@inso_web/els-react`](https://github.com/official-inso/els-react) — React Provider, hooks, ErrorBoundary
+- [`@inso_web/els-vue`](https://github.com/official-inso/els-vue) — Vue 3 plugin
 
 **Другие стеки**
-- [`Inso.Els`](../csharp/README_RU.md) — .NET (Core + ASP.NET Core + ILogger)
-- [`io.github.official-inso:els-core`](../java/README_RU.md) — Java + Spring Boot starter + SLF4J
-- [`github.com/official-inso/els-go`](../els-go/README_RU.md) — Go
-
-→ **Обзор и сравнение:** [../README_RU.md](../README_RU.md) · [github.com/official-inso/els-go/blob/main/sdks/README_RU.md](https://github.com/official-inso/els-go/blob/main/sdks/README_RU.md)
+- [`Inso.Els`](https://github.com/official-inso/els-csharp) — .NET (Core + ASP.NET Core + ILogger)
+- [`io.github.official-inso:els-core`](https://github.com/official-inso/els-java) — Java + Spring Boot starter + SLF4J
+- [`github.com/official-inso/els-go`](https://github.com/official-inso/els-go) — Go
 
 ---
 
