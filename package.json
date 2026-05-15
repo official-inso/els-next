@@ -1,0 +1,62 @@
+{
+  "name": "@inso_web/els-next",
+  "version": "0.4.2",
+  "description": "Next.js helpers для @inso_web/els-client — логирование в API routes (Pages + App Router), middleware.ts, edge runtime support. Drop-in замена console.log в Next.js приложениях.",
+  "homepage": "https://api.insoweb.ru/els",
+  "author": "INSOWEB",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": ["dist", "docs", "examples", "README.md", "LICENSE"],
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "nextjs",
+    "next",
+    "next-logger",
+    "edge-runtime",
+    "vercel",
+    "app-router",
+    "pages-router",
+    "logger",
+    "logging",
+    "structured-logging",
+    "error-tracking",
+    "observability",
+    "els",
+    "inso",
+    "insoweb"
+  ],
+  "license": "MIT",
+  "peerDependencies": {
+    "next": ">=13.0.0"
+  },
+  "dependencies": {
+    "@inso_web/els-client": "^0.4.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "next": "^14.1.0",
+    "react": "^18.2.0",
+    "tsup": "^8.0.1",
+    "typescript": "^5.3.3",
+    "vitest": "^1.2.0"
+  }
+}
