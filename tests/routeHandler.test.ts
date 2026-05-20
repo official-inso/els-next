@@ -25,7 +25,6 @@ describe("withELSRouteLogger", () => {
     vi.stubGlobal("fetch", fetchMock);
     consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     createELSLogger({
-      endpoint: "https://example.test",
       apiKey: "test-key",
       appSlug: "test-app",
     });

@@ -8,8 +8,11 @@ function genReqId(): string {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
+/** Second argument passed to a handler wrapped by {@link withELSRouteLogger}. */
 export interface ELSRouteContext {
+  /** Request-scoped child logger (bound with requestId/method/url + UA/referrer/language). */
   log: Logger;
+  /** The resolved request id (incoming `x-request-id` or generated). */
   reqId: string;
 }
 
@@ -19,10 +22,9 @@ type AppRouteHandler = (
 ) => Promise<Response> | Response;
 
 /**
- * Wrapper для Next.js App Router route handlers (`route.ts`).
- *
- * Передаёт второй аргумент `{ log, reqId }` в handler. После выполнения
- * автоматически логирует с правильным level и проставляет `x-request-id` в response.
+ * Wraps a Next.js App Router route handler (`route.ts`). Passes a second
+ * argument `{ log, reqId }`, auto-logs the finished request at the right level,
+ * sets `x-request-id` on the response, and reports unhandled errors.
  *
  * @example
  * // app/api/users/[id]/route.ts
@@ -43,6 +45,10 @@ export function withELSRouteLogger(
       requestId: reqId,
       method: req.method,
       url: req.url,
+      // Auto-extract request context — these keys map to ErrorEntry fields.
+      userAgent: req.headers.get("user-agent") ?? undefined,
+      referrer: req.headers.get("referer") ?? undefined,
+      language: req.headers.get("accept-language") ?? undefined,
     });
     const start = Date.now();
     try {
