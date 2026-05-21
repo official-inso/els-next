@@ -1,6 +1,6 @@
 {
   "name": "@inso_web/els-next",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Next.js helpers для @inso_web/els-client — логирование в API routes (Pages + App Router), middleware.ts, edge runtime support. Drop-in замена console.log в Next.js приложениях.",
   "homepage": "https://api.insoweb.ru/els",
   "author": "INSOWEB",

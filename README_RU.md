@@ -72,7 +72,6 @@ npm install @inso_web/els-client @inso_web/els-next
 import { createELSLogger } from '@inso_web/els-next';
 
 export const log = createELSLogger({
-  endpoint: process.env.NEXT_PUBLIC_ELS_URL!,
   apiKey: process.env.NEXT_PUBLIC_ELS_API_KEY ?? '',
   appSlug: 'my-nextjs-app',
   serviceName: 'web',
@@ -257,7 +256,6 @@ reqLog.info('processing checkout');
 
 | Опция | Описание |
 |---|---|
-| `endpoint` | URL ELS (обязательно) |
 | `apiKey` | API-ключ (обязательно) |
 | `appSlug` | Slug приложения (обязательно) |
 | `serviceName` | Имя сервиса / модуля |
@@ -301,7 +299,7 @@ useEffect(() => {
 ```ts
 // lib/logger.ts
 import { createELSLogger } from '@inso_web/els-next';
-export const log = createELSLogger({ endpoint, apiKey, appSlug: 'my-app' });
+export const log = createELSLogger({ apiKey, appSlug: 'my-app' });
 ```
 
 ```ts
@@ -375,7 +373,6 @@ export async function GET() {
 // lib/logger.ts — один конфиг для client + server
 import { createELSLogger } from '@inso_web/els-next';
 export const log = createELSLogger({
-  endpoint: process.env.NEXT_PUBLIC_ELS_URL!,
   apiKey: process.env.NEXT_PUBLIC_ELS_API_KEY!,
   appSlug: 'my-app',
   deploymentEnv: process.env.NODE_ENV === 'production' ? 'PRODUCTION' : 'DEV',
@@ -396,7 +393,7 @@ export async function GET() {
 | Sentry | ELS | Заметки |
 |---|---|---|
 | `sentry.{server,client,edge}.config.ts` | один `lib/logger.ts` | Без runtime-специфичных конфигов |
-| `dsn` | `endpoint` + `apiKey` + `appSlug` | Три явных поля |
+| `dsn` | `apiKey` + `appSlug` | Три явных поля |
 | `captureException(err)` | `log.error(err)` | |
 | `captureMessage(msg, level)` | `log.<level>(msg)` | |
 | `release` | `appVersion` | То же, любая строка ≤128 |

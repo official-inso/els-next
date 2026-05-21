@@ -72,7 +72,6 @@ npm install @inso_web/els-client @inso_web/els-next
 import { createELSLogger } from '@inso_web/els-next';
 
 export const log = createELSLogger({
-  endpoint: process.env.NEXT_PUBLIC_ELS_URL!,
   apiKey: process.env.NEXT_PUBLIC_ELS_API_KEY ?? '',
   appSlug: 'my-nextjs-app',
   serviceName: 'web',
@@ -257,7 +256,6 @@ Use bindings to carry per-request context through async boundaries.
 
 | Option | Description |
 |---|---|
-| `endpoint` | ELS URL (required) |
 | `apiKey` | API key (required) |
 | `appSlug` | App slug (required) |
 | `serviceName` | Module / service name |
@@ -301,7 +299,7 @@ useEffect(() => {
 ```ts
 // lib/logger.ts
 import { createELSLogger } from '@inso_web/els-next';
-export const log = createELSLogger({ endpoint, apiKey, appSlug: 'my-app' });
+export const log = createELSLogger({ apiKey, appSlug: 'my-app' });
 ```
 
 ```ts
@@ -375,7 +373,6 @@ export async function GET() {
 // lib/logger.ts — single config for client + server
 import { createELSLogger } from '@inso_web/els-next';
 export const log = createELSLogger({
-  endpoint: process.env.NEXT_PUBLIC_ELS_URL!,
   apiKey: process.env.NEXT_PUBLIC_ELS_API_KEY!,
   appSlug: 'my-app',
   deploymentEnv: process.env.NODE_ENV === 'production' ? 'PRODUCTION' : 'DEV',
@@ -396,7 +393,7 @@ export async function GET() {
 | Sentry concept | ELS equivalent | Notes |
 |---|---|---|
 | `sentry.{server,client,edge}.config.ts` | One `lib/logger.ts` | No runtime-specific configs |
-| `dsn` | `endpoint` + `apiKey` + `appSlug` | Three explicit fields |
+| `dsn` | `apiKey` + `appSlug` | Three explicit fields |
 | `captureException(err)` | `log.error(err)` | |
 | `captureMessage(msg, level)` | `log.<level>(msg)` | |
 | `release` | `appVersion` | Same field, any string ≤128 chars |
