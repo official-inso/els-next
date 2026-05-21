@@ -37,10 +37,27 @@ export function withELSLogger(handler: NextApiHandler): NextApiHandler {
     const incoming = req.headers["x-request-id"];
     const reqId =
       (typeof incoming === "string" && incoming) || genReqId();
+    const al =
+      (Array.isArray(req.headers["accept-language"])
+        ? req.headers["accept-language"][0]
+        : req.headers["accept-language"]) ?? "";
+    const ua =
+      (Array.isArray(req.headers["user-agent"])
+        ? req.headers["user-agent"][0]
+        : req.headers["user-agent"]) ?? "";
+    const ref =
+      (Array.isArray(req.headers["referer"])
+        ? req.headers["referer"][0]
+        : req.headers["referer"]) ?? "";
     const log = getLogger().child({
       requestId: reqId,
       method: req.method,
       url: req.url,
+      // Normalize to ELS schema limits (language ≤ 20 → first tag,
+      // userAgent ≤ 1000, referrer ≤ 2000) to avoid 400 rejections.
+      userAgent: ua.slice(0, 1000) || undefined,
+      referrer: ref.slice(0, 2000) || undefined,
+      language: al.split(",")[0]?.trim().slice(0, 20) || undefined,
     });
     (req as NextApiRequestWithLogger).log = log;
     (req as NextApiRequestWithLogger).id = reqId;

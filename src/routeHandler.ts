@@ -41,14 +41,18 @@ export function withELSRouteLogger(
 ): (req: Request) => Promise<Response> {
   return async (req: Request): Promise<Response> => {
     const reqId = req.headers.get("x-request-id") || genReqId();
+    const al = req.headers.get("accept-language") ?? "";
     const log = getLogger().child({
       requestId: reqId,
       method: req.method,
       url: req.url,
       // Auto-extract request context — these keys map to ErrorEntry fields.
-      userAgent: req.headers.get("user-agent") ?? undefined,
-      referrer: req.headers.get("referer") ?? undefined,
-      language: req.headers.get("accept-language") ?? undefined,
+      // Normalize to the ELS schema limits (language ≤ 20 → first tag,
+      // userAgent ≤ 1000, referrer ≤ 2000) so a raw header never gets the
+      // whole entry rejected with a 400.
+      userAgent: (req.headers.get("user-agent") ?? "").slice(0, 1000) || undefined,
+      referrer: (req.headers.get("referer") ?? "").slice(0, 2000) || undefined,
+      language: al.split(",")[0]?.trim().slice(0, 20) || undefined,
     });
     const start = Date.now();
     try {
